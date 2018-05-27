@@ -120,7 +120,61 @@ def compute_global_alignment(seq_x,seq_y,scoring_matrix,align_matrix):
         
     return (score, align_x, align_y)
 
-score_matrix = build_scoring_matrix('abcd', 10, 4, -6)
-align_matrix = compute_alignment_matrix('ab','abd', score_matrix, True)
-print(align_matrix)
-print (compute_global_alignment('ab','abd', score_matrix, align_matrix))
+def compute_local_alignment(seq_x,seq_y,scoring_matrix,align_matrix):
+    """
+    Similar to compute_global_alignment except computes an optimal local alignment 
+    starting at the maximum entry of the local alignment matrix and working backwards.
+    The align sequences will stop when the alignment matrix reaches a score of zero.
+    """
+    #get starting position (max entry of local alignment)
+    score = -1
+    start_pos = [0, 0]
+    for pos_x in range(0, len(seq_x) + 1):
+        for pos_y in range(0, len(seq_y) + 1):
+            if align_matrix[pos_x][pos_y] > score:
+                score = align_matrix[pos_x][pos_y]
+                start_pos = [pos_x, pos_y]
+    
+    index_i = start_pos[0]
+    index_j = start_pos[1]
+    align_x = ''
+    align_y = ''
+             
+    while index_i != 0 and index_j != 0 and align_matrix[index_i][index_j] != 0:
+        if align_matrix[index_i][index_j] == align_matrix[index_i - 1][index_j - 1] + scoring_matrix[seq_x[index_i - 1]][seq_y[index_j - 1]]:
+            # if current position came from diagonal 
+            print(index_i, index_j, 'diag')
+            align_x = seq_x[index_i -1] + align_x
+            align_y = seq_y[index_j - 1] + align_y
+            index_i -= 1
+            index_j -= 1
+        elif align_matrix[index_i][index_j] == align_matrix[index_i - 1][index_j] + scoring_matrix[seq_x[index_i - 1]]['-']:
+            # if current pos came from top
+            align_x = seq_x[index_i -1] + align_x
+            align_y = '-' + align_y
+            index_i -= 1
+        else:
+            # if current pos came from left
+            align_x = '-' + align_x
+            align_y = seq_y[index_j - 1] + align_y
+            index_j -= 1
+    
+    # consider row 0 and col 0 
+    while index_i != 0 and align_matrix[index_i][index_j] != 0:
+        align_x = seq_x[index_i -1] + align_x
+        align_y = '-' + align_y
+        index_i -= 1
+        
+    while index_j != 0 and align_matrix[index_i][index_j] != 0:
+        align_x = '-' + align_x
+        align_y = seq_y[index_j - 1] + align_y
+        index_j -= 1
+        
+    return (score, align_x, align_y)
+
+    
+#score_matrix = build_scoring_matrix('abcd', 10, 4, -6)
+#align_matrix = compute_alignment_matrix('ab','abd', score_matrix, False)
+#print(align_matrix)
+#print(compute_local_alignment('ab','abd', score_matrix, align_matrix))
+#print (compute_local_alignment('ACTACT', 'AGCTA', {'A': {'A': 2, 'C': 1, '-': 0, 'T': 1, 'G': 1}, 'C': {'A': 1, 'C': 2, '-': 0, 'T': 1, 'G': 1}, '-': {'A': 0, 'C': 0, '-': 0, 'T': 0, 'G': 0}, 'T': {'A': 1, 'C': 1, '-': 0, 'T': 2, 'G': 1}, 'G': {'A': 1, 'C': 1, '-': 0, 'T': 1, 'G': 2}}, [[0, 0, 0, 0, 0, 0], [0, 2, 2, 2, 2, 2], [0, 2, 3, 4, 4, 4], [0, 2, 3, 4, 6, 6], [0, 2, 3, 4, 6, 8], [0, 2, 3, 5, 6, 8], [0, 2, 3, 5, 7, 8]]))
