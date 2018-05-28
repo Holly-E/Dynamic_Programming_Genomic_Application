@@ -43,7 +43,7 @@ def read_scoring_matrix(filename):
         xkey = vals.pop(0).decode("utf-8") #add if opening in py3 to remove bytes prefix 
         scoring_dict[xkey] = {}
         for ykey, val in zip(ykeychars, vals):
-            ykey = ykey.decode("utf-8") # must be decoded at each element within a list, not the full list
+            ykey = ykey.decode("utf-8") # must be decoded at each element within a list, not the full list!!
             scoring_dict[xkey][ykey] = int(val)
     return scoring_dict
 

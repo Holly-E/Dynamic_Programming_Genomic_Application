@@ -143,7 +143,6 @@ def compute_local_alignment(seq_x,seq_y,scoring_matrix,align_matrix):
     while index_i != 0 and index_j != 0 and align_matrix[index_i][index_j] != 0:
         if align_matrix[index_i][index_j] == align_matrix[index_i - 1][index_j - 1] + scoring_matrix[seq_x[index_i - 1]][seq_y[index_j - 1]]:
             # if current position came from diagonal 
-            print(index_i, index_j, 'diag')
             align_x = seq_x[index_i -1] + align_x
             align_y = seq_y[index_j - 1] + align_y
             index_i -= 1
